@@ -9,3 +9,4 @@ node_modules/
 /signing.local.json
 /CLAUDE.md
 /.claude/
+/handoff.md

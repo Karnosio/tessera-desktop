@@ -1,0 +1,11 @@
+{
+  "log": { "level": "info" },
+  "inbounds": [{ "type": "mixed", "tag": "mixed-in", "listen": "127.0.0.1", "listen_port": 2081 }],
+  "outbounds": [
+    { "type": "selector", "tag": "proxy", "outbounds": ["auto", "direct-a", "direct-b"], "default": "auto" },
+    { "type": "urltest", "tag": "auto", "outbounds": ["direct-a", "direct-b"] },
+    { "type": "direct", "tag": "direct-a" },
+    { "type": "direct", "tag": "direct-b" }
+  ],
+  "route": { "final": "proxy" }
+}

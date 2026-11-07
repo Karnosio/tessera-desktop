@@ -5,7 +5,7 @@ $out = "C:\out\$(Get-Date -Format 'HHmmss').txt"
     "== $(Get-Date -Format o)"
 
     "== processes"
-    $rows = foreach ($p in Get-CimInstance Win32_Process -Filter "Name LIKE 'sing-box%'") {
+    $rows = foreach ($p in Get-CimInstance Win32_Process -Filter "Name LIKE 'slate%'") {
         $live = Get-Process -Id $p.ProcessId -ErrorAction SilentlyContinue
         if ($null -eq $live) { continue }
         $role = if ($p.CommandLine -match '--type=(\S+)') { $Matches[1] } elseif ($p.CommandLine -match '\s(service|worker|run)\b') { $Matches[1] } else { 'main' }
@@ -25,7 +25,7 @@ $out = "C:\out\$(Get-Date -Format 'HHmmss').txt"
     }
 
     "== service"
-    Get-Service sing-box-daemon -ErrorAction SilentlyContinue | Format-List Name, Status, StartType | Out-String
+    Get-Service slate-daemon -ErrorAction SilentlyContinue | Format-List Name, Status, StartType | Out-String
 
     "== adapters"
     Get-NetAdapter | Format-Table Name, InterfaceDescription, Status -AutoSize | Out-String -Width 200
@@ -41,7 +41,7 @@ $out = "C:\out\$(Get-Date -Format 'HHmmss').txt"
 
     "== daemon events"
     try {
-        Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'sing-box-daemon' } -MaxEvents 30 -ErrorAction Stop |
+        Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'slate-daemon' } -MaxEvents 30 -ErrorAction Stop |
             Format-Table TimeCreated, LevelDisplayName, Message -Wrap | Out-String -Width 200
     } catch {}
 } *>&1 | Tee-Object -FilePath $out

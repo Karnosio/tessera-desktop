@@ -1,0 +1,44 @@
+# Тег v<версия> из package.json -> установщик тем же tessera/build/build.sh -> черновик релиза.
+# Публикует владелец руками. Сертификат и пароль — секреты SLATE_PFX_BASE64 и SLATE_PFX_PASSWORD.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Tag matches package.json
+        run: test "v$(node -p 'require("./package.json").version')" = "$GITHUB_REF_NAME"
+
+      # Образ и кэши сборки — около 10 ГБ.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - name: Build
+        env:
+          SLATE_PFX_BASE64: ${{ secrets.SLATE_PFX_BASE64 }}
+          SLATE_PFX_PASSWORD: ${{ secrets.SLATE_PFX_PASSWORD }}
+        run: |
+          : "${SLATE_PFX_BASE64:?secret SLATE_PFX_BASE64 is not set}"
+          export SLATE_PFX=$RUNNER_TEMP/slate.pfx
+          base64 -d <<< "$SLATE_PFX_BASE64" > "$SLATE_PFX"
+          TESSERA_BUILD_DIR=$RUNNER_TEMP/build tessera/build/build.sh
+          rm "$SLATE_PFX"
+
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          core=$(node -p 'require("./version.json").version')
+          gh release create "$GITHUB_REF_NAME" release/Slate-*-x64.exe --draft \
+            --title "Slate ${GITHUB_REF_NAME#v}" --notes "Ядро sing-box $core."
