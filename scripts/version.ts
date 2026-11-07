@@ -16,9 +16,19 @@ function readVersionMetadata(): VersionMetadata {
 }
 
 export function readApplicationVersion(): string {
+  const { version } = JSON.parse(
+    readFileSync(path.join(repositoryRoot, "package.json"), "utf-8"),
+  ) as { version?: unknown };
+  if (typeof version !== "string" || version === "") {
+    throw new Error("package.json contains no application version");
+  }
+  return version;
+}
+
+export function readCoreVersion(): string {
   const versionMetadata = readVersionMetadata();
   if (typeof versionMetadata.version !== "string" || versionMetadata.version === "") {
-    throw new Error("version.json contains no application version");
+    throw new Error("version.json contains no core version");
   }
   return versionMetadata.version;
 }

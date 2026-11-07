@@ -61,7 +61,7 @@ const checkUpdateEnabledPreference = new Preference(
   false,
   parseBooleanPreference,
 );
-const updateCheckPromptedPreference = new Preference(
+export const updateCheckPromptedPreference = new Preference(
   "update_check_prompted",
   false,
   parseBooleanPreference,

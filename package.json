@@ -1,5 +1,6 @@
 {
   "name": "slate",
+  "version": "0.1.0",
   "desktopName": "sing-box.desktop",
   "private": true,
   "description": "Slate",

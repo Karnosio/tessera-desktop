@@ -6,6 +6,7 @@ import { captureRuntimeCrash } from "../appReports";
 import { developmentRendererURL } from "../development";
 import { resourcePath } from "../resources";
 import { titleBarOverlay } from "../titleBarOverlay";
+import { updateCheckPromptedPreference } from "../updates";
 
 let advancedWindow: BrowserWindow | null = null;
 
@@ -27,6 +28,8 @@ export function registerAdvancedWindow(onClosed: () => void) {
       advancedWindow.focus();
       return;
     }
+    // Как на Android: панель не спрашивает про проверку обновлений на GitHub, проверка остаётся выключенной.
+    updateCheckPromptedPreference.set(true);
     const overlay = titleBarOverlay();
     const window = new BrowserWindow({
       width: 1280,

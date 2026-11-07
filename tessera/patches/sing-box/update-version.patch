@@ -1,0 +1,54 @@
+diff --git a/experimental/boxdd/update_windows.go b/experimental/boxdd/update_windows.go
+--- a/experimental/boxdd/update_windows.go
++++ b/experimental/boxdd/update_windows.go
+@@ -5,12 +5,12 @@ package main
+ import (
+ 	"bytes"
+ 	"fmt"
++	"os"
+ 	"path/filepath"
+ 	"strings"
+ 	"unsafe"
+ 
+ 	"github.com/sagernet/sing-box/common/badversion"
+-	C "github.com/sagernet/sing-box/constant"
+ 	"github.com/sagernet/sing-box/experimental/libbox"
+ 	E "github.com/sagernet/sing/common/exceptions"
+ 
+@@ -80,7 +80,11 @@ func (d *Daemon) installUpdate(identity peerIdentity, installerPath string) (*In
+ 	if !badversion.IsValid(installerIdentity.version) {
+ 		return nil, status.Error(codes.InvalidArgument, "update installer has an invalid version")
+ 	}
+-	if !libbox.CompareSemver(installerIdentity.version, C.Version) {
++	installedVersion, err := installedApplicationVersion()
++	if err != nil {
++		return nil, E.Cause(err, "read installed application version")
++	}
++	if !libbox.CompareSemver(installerIdentity.version, installedVersion) {
+ 		return &InstallUpdateResponse{Result: InstallUpdateResult_INSTALL_UPDATE_RESULT_NOT_NEWER}, nil
+ 	}
+ 	installerProcess, err := launchUpdateInstaller(installerFinalPath, identity.SessionID)
+@@ -100,6 +104,23 @@ func (p *windowsPlatformInterface) waitUpdateInstaller(process windows.Handle) {
+ 	p.updateAccess.Unlock()
+ }
+ 
++// The application has its own version, separate from the core tag in C.Version.
++func installedApplicationVersion() (string, error) {
++	daemonPath, err := os.Executable()
++	if err != nil {
++		return "", err
++	}
++	_, applicationPath, err := installedApplicationPath(daemonPath)
++	if err != nil {
++		return "", err
++	}
++	identity, err := windowsExecutableIdentity(applicationPath)
++	if err != nil {
++		return "", err
++	}
++	return identity.version, nil
++}
++
+ type windowsExecutableVersionIdentity struct {
+ 	productName string
+ 	version     string
