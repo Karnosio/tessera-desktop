@@ -1,0 +1,64 @@
+/* Раскладка окна Slate. Сами компоненты — в бандле Tessera UI, здесь только то, что в превью задаёт рамка телефона. */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.slate-screen {
+  height: 100%;
+}
+
+.slate-screen .ts-screen-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Как .pv-main в превью MainScreen: кнопка вверху, карточка внизу */
+.slate-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.slate-power {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  padding-top: var(--space-12);
+}
+
+.slate-center {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.slate-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.slate-modal {
+  display: contents;
+}
+
+.slate-toast {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: 10;
+}
+
+.slate-detail {
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+}

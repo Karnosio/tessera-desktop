@@ -53,7 +53,9 @@ import { initializeTray, updateTrayVisibility } from "./tray";
 import { registerUpdates, runStartupUpdateCheck } from "./updates";
 import { prepareTrayMenuWindow, showTrayMenu } from "./trayMenu";
 import { registerTerminalWindows } from "./terminalWindows";
-import { applyTitleBarOverlayColors, titleBarOverlay } from "./titleBarOverlay";
+import { hasAdvancedWindow, isAdvancedWindow } from "./tessera/advancedWindow";
+import { registerTessera } from "./tessera/bridge";
+import { applyTitleBarOverlayColors } from "./titleBarOverlay";
 import {
   MAIN_WINDOW_MINIMUM_HEIGHT,
   MAIN_WINDOW_MINIMUM_WIDTH,
@@ -132,8 +134,8 @@ function createWindow(): BrowserWindow {
   const window = new BrowserWindow({
     x: restoredBounds?.x,
     y: restoredBounds?.y,
-    width: restoredBounds?.width ?? 1280,
-    height: restoredBounds?.height ?? 800,
+    width: restoredBounds?.width ?? 440,
+    height: restoredBounds?.height ?? 780,
     minWidth: Math.min(
       MAIN_WINDOW_MINIMUM_WIDTH,
       restoredBounds?.width ?? MAIN_WINDOW_MINIMUM_WIDTH,
@@ -143,9 +145,6 @@ function createWindow(): BrowserWindow {
       restoredBounds?.height ?? MAIN_WINDOW_MINIMUM_HEIGHT,
     ),
     show: false,
-    titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "hidden",
-    trafficLightPosition: process.platform === "darwin" ? { x: 18, y: 19 } : undefined,
-    titleBarOverlay: titleBarOverlay(),
     icon: process.platform === "linux" ? resourcePath("icons", "512x512.png") : undefined,
     webPreferences: {
       preload: join(import.meta.dirname, "../preload/index.cjs"),
@@ -155,6 +154,9 @@ function createWindow(): BrowserWindow {
       backgroundThrottling: !testScriptPath,
     },
   });
+  if (process.platform !== "darwin") {
+    window.removeMenu();
+  }
   if (process.platform === "win32") {
     registerMainWindowStatePersistence(window, restoredState?.maximized === true);
   }
@@ -192,9 +194,9 @@ function createWindow(): BrowserWindow {
   const rendererURL = developmentRendererURL();
   let loadPromise: Promise<void>;
   if (rendererURL !== "") {
-    loadPromise = window.loadURL(rendererURL);
+    loadPromise = window.loadURL(`${rendererURL}/slate.html`);
   } else {
-    loadPromise = window.loadFile(join(import.meta.dirname, "../renderer/index.html"));
+    loadPromise = window.loadFile(join(import.meta.dirname, "../renderer/slate.html"));
   }
   void loadPromise.catch((error: unknown) => handleFatal("main-window-load", error));
   attachTestInstrumentation(window);
@@ -219,6 +221,7 @@ function maybeQuitAfterWindowClosed() {
     mainWindow === null &&
     !terminalWindows?.size &&
     !profileEditorWindows?.size &&
+    !hasAdvancedWindow() &&
     !trayInBackground()
   ) {
     app.quit();
@@ -469,6 +472,7 @@ if (!singleInstanceLock) {
     archiveNativeCrashDumps();
     terminalWindows = registerTerminalWindows(maybeQuitAfterWindowClosed);
     profileEditorWindows = registerProfileEditorWindows(maybeQuitAfterWindowClosed);
+    registerTessera(maybeQuitAfterWindowClosed);
     registerApplication(showWindow);
     ipcMain.on(APP_TITLE_BAR_OVERLAY, (event, colors: TitleBarOverlayColors) => {
       if (process.platform === "darwin") {
@@ -477,7 +481,7 @@ if (!singleInstanceLock) {
       const window = BrowserWindow.fromWebContents(event.sender);
       if (
         window !== null &&
-        (window === mainWindow ||
+        (isAdvancedWindow(window) ||
           terminalWindows?.has(window) === true ||
           profileEditorWindows?.has(window) === true)
       ) {

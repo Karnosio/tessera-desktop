@@ -4,8 +4,8 @@ const MAIN_WINDOW_DEFAULT_WIDTH = 960;
 const MAIN_WINDOW_DEFAULT_HEIGHT = 640;
 // The dashboard switches to its mobile drawer layout at (max-width: 720px),
 // and the button reopening the drawer is only rendered in the web build.
-export const MAIN_WINDOW_MINIMUM_WIDTH = 721;
-export const MAIN_WINDOW_MINIMUM_HEIGHT = 320;
+export const MAIN_WINDOW_MINIMUM_WIDTH = 360;
+export const MAIN_WINDOW_MINIMUM_HEIGHT = 560;
 
 export interface MainWindowState extends Rectangle {
   maximized: boolean;

@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 import type { IpcRendererEvent } from "electron";
 
+import { exposeTessera } from "./tessera";
+
 import {
   APP_CALL,
   APP_NAVIGATE,
@@ -366,3 +368,4 @@ const bridge: DesktopBridge = {
 };
 
 contextBridge.exposeInMainWorld("desktop", bridge);
+exposeTessera();

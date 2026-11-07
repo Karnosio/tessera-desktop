@@ -1,0 +1,119 @@
+/* Сгенерировано design/tools/make_desktop.py из дизайн-системы Tessera UI. Не править руками. */
+@font-face { font-family: 'Manrope'; src: url('./fonts/Manrope-Variable.ttf'); font-weight: 200 800; }
+@font-face { font-family: 'JetBrains Mono'; src: url('./fonts/JetBrainsMono-Variable.ttf'); font-weight: 100 800; }
+:root { color-scheme: light dark; }
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-panel: 22px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-control: 13px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-3xl: 22px;
+  --radius-4xl: 26px;
+  --radius-full: 9999px;
+  --touch-min: 48px;
+  --control-sm: 40px;
+  --control: 50px;
+  --control-lg: 56px;
+  --row: 64px;
+  --power: 168px;
+  --font-heading: Manrope, system-ui, sans-serif;
+  --font-sans: Manrope, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --paper: #e8ecef;
+  --background: #f5f7f8;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --muted: #eef1f3;
+  --secondary: #e3e8ec;
+  --accent: #edf1fd;
+  --foreground: #111a22;
+  --muted-foreground: #56616d;
+  --accent-foreground: #2747b8;
+  --primary: #2f52cc;
+  --primary-hover: #2644b0;
+  --primary-foreground: #ffffff;
+  --success: #087563;
+  --success-foreground: #ffffff;
+  --success-soft: #e2f3ef;
+  --warning: #985a00;
+  --warning-soft: #fbf0dc;
+  --destructive: #c23a22;
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #fbe9e5;
+  --border: #d8dee4;
+  --border-strong: #5f6b77;
+  --input: #7b8793;
+  --input-background: #f7f9fa;
+  --input-placeholder: #68737f;
+  --ring: var(--primary);
+  --grid-major: rgba(47, 82, 204, 0.10);
+  --grid-minor: rgba(17, 26, 34, 0.055);
+  --scrim: rgba(10, 14, 18, 0.40);
+  --shadow-xs: 0 1px 2px rgba(17, 26, 34, 0.06);
+  --shadow-card: 0 14px 34px rgba(17, 26, 34, 0.07);
+  --shadow-cta: 0 12px 28px rgba(47, 82, 204, 0.28);
+  --shadow-cta-hover: 0 16px 34px rgba(47, 82, 204, 0.36);
+  --shadow-connected: 0 18px 44px rgba(8, 117, 99, 0.32);
+  --shadow-sheet: 0 -12px 40px rgba(17, 26, 34, 0.14);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0a0e12;
+    --background: #0e1317;
+    --card: #151b21;
+    --popover: #1a2128;
+    --muted: #1b2229;
+    --secondary: #232b33;
+    --accent: #18213b;
+    --foreground: #e9eef2;
+    --muted-foreground: #9ba7b3;
+    --accent-foreground: #a9bcff;
+    --primary: #8aa4ff;
+    --primary-hover: #a3b8ff;
+    --primary-foreground: #0a1433;
+    --success: #43cfae;
+    --success-foreground: #032419;
+    --success-soft: #0f2a26;
+    --warning: #f0b252;
+    --warning-soft: #2b2112;
+    --destructive: #ff8c78;
+    --destructive-foreground: #2e0a04;
+    --destructive-soft: #331713;
+    --border: #262f37;
+    --border-strong: #8794a0;
+    --input: #62707c;
+    --input-background: #11171c;
+    --input-placeholder: #8a96a2;
+    --grid-major: rgba(138, 164, 255, 0.12);
+    --grid-minor: rgba(233, 238, 242, 0.05);
+    --scrim: rgba(0, 0, 0, 0.60);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.40);
+    --shadow-card: 0 14px 34px rgba(0, 0, 0, 0.38);
+    --shadow-cta: 0 12px 28px rgba(138, 164, 255, 0.22);
+    --shadow-cta-hover: 0 16px 34px rgba(138, 164, 255, 0.30);
+    --shadow-connected: 0 18px 44px rgba(67, 207, 174, 0.22);
+    --shadow-sheet: 0 -12px 40px rgba(0, 0, 0, 0.50);
+  }
+}
+.t-display { font-family: var(--font-heading); font-size: 30px; line-height: 36px; font-weight: 800; letter-spacing: -0.02em; }
+.t-title { font-family: var(--font-heading); font-size: 23px; line-height: 30px; font-weight: 800; letter-spacing: -0.02em; }
+.t-heading { font-family: var(--font-heading); font-size: 18px; line-height: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.t-body { font-family: var(--font-sans); font-size: 17px; line-height: 24px; font-weight: 500; letter-spacing: normal; }
+.t-body-strong { font-family: var(--font-sans); font-size: 17px; line-height: 24px; font-weight: 700; letter-spacing: normal; }
+.t-secondary { font-family: var(--font-sans); font-size: 15px; line-height: 21px; font-weight: 500; letter-spacing: normal; }
+.t-control { font-family: var(--font-sans); font-size: 17px; line-height: 22px; font-weight: 700; letter-spacing: normal; }
+.t-control-sm { font-family: var(--font-sans); font-size: 15px; line-height: 20px; font-weight: 600; letter-spacing: normal; }
+.t-caption { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 600; letter-spacing: normal; }
+.t-label { font-family: var(--font-mono); font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.1em; }
+.t-numeric { font-family: var(--font-mono); font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: normal; }

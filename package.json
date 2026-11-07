@@ -20,7 +20,10 @@
   "main": "./out/main/index.js",
   "sideEffects": [
     "./src/renderer/src/main.tsx",
-    "./src/renderer/src/tray.tsx"
+    "./src/renderer/src/tray.tsx",
+    "./src/renderer/src/tessera/main.tsx",
+    "./src/renderer/src/tessera/reactGlobal.ts",
+    "./src/renderer/src/tessera/ui/bundle.js"
   ],
   "scripts": {
     "generate": "tsx scripts/generate.ts",
