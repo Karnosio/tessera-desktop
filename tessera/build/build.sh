@@ -12,6 +12,7 @@ mkdir -p "$work"
 git -C "$work/sing-box" fetch --quiet --tags "$core_origin"
 git -C "$work/sing-box" -c advice.detachedHead=false checkout --quiet --force "$core_tag"
 git -C "$work/sing-box" clean -fdq
+git -C "$work/sing-box" apply "$repo"/tessera/patches/sing-box/*.patch
 
 docker build -t tessera-desktop-build "$repo/tessera/build"
 docker run --rm --user "$(id -u):$(id -g)" \

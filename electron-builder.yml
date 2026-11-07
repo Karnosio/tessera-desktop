@@ -1,4 +1,4 @@
-productName: sing-box
+productName: Slate
 copyright: nekohasekai
 publish: null
 afterPack: scripts/afterPack.cjs
@@ -47,7 +47,7 @@ fileAssociations:
     description: sing-box profile
     mimeType: application/x-sing-box-profile
 win:
-  appId: io.nekohasekai.sfw
+  appId: com.tessera.slate
   forceCodeSigning: true
   icon: resources/icon.ico
   signtoolOptions:
@@ -59,28 +59,18 @@ win:
     - from: resources/trayStopped.ico
       to: trayStopped.ico
     - from: bin/windows/${arch}/sing-box-daemon.exe
-      to: daemon/sing-box-daemon.exe
+      to: daemon/slate-daemon.exe
     - from: bin/windows/${arch}
       to: daemon
       filter:
         - libcronet.dll
         - WinDivert64.sys
         - WinDivert32.sys
-        - VBoxUSB.sys
-        - VBoxUSB.inf
-        - VBoxUSB.cat
-        - VBoxUSBMon.sys
-        - usbip2_ude.sys
-        - usbip2_ude.inf
-        - usbip2_ude.cat
-        - usbip2_filter.sys
-        - usbip2_filter.inf
-        - usbip2_filter.cat
     - from: bin/windows/${arch}/windows_share.node
       to: native/windows_share.node
   target:
     - nsis
-  artifactName: SFW-${version}-${env.SFW_ARCHITECTURE}.${ext}
+  artifactName: Slate-${version}-${env.SFW_ARCHITECTURE}.${ext}
 nsis:
   oneClick: false
   buildUniversalInstaller: false
@@ -95,7 +85,7 @@ nsis:
   allowToChangeInstallationDirectory: false
   deleteAppDataOnUninstall: false
   include: build/installer.nsh
-  artifactName: SFW-${version}-${env.SFW_ARCHITECTURE}.${ext}
+  artifactName: Slate-${version}-${env.SFW_ARCHITECTURE}.${ext}
 linux:
   appId: io.nekohasekai.sfl
   syncDesktopName: true

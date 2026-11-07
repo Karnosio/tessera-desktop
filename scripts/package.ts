@@ -263,7 +263,7 @@ async function runWindowsElectronBuilder(
   artifactArchitecture: string,
   signingConfiguration: WindowsSigningConfiguration,
 ): Promise<void> {
-  const artifactName = `SFW-\${version}-${artifactArchitecture}${developmentPackage ? "-dev" : ""}.\${ext}`;
+  const artifactName = `Slate-\${version}-${artifactArchitecture}${developmentPackage ? "-dev" : ""}.\${ext}`;
   const unpackedDirectory = {
     x64: "win-unpacked",
     x86: "win-ia32-unpacked",
@@ -329,7 +329,7 @@ const windowsArchitectures = [
     portableExecutableMachine: 0x8664,
     includesCronet: true,
     winDivertDriver: "WinDivert64.sys",
-    includesUSBIPDrivers: true,
+    includesUSBIPDrivers: false,
   },
   {
     goArchitecture: "386",
@@ -349,7 +349,7 @@ const windowsArchitectures = [
     portableExecutableMachine: 0xaa64,
     includesCronet: true,
     winDivertDriver: null,
-    includesUSBIPDrivers: true,
+    includesUSBIPDrivers: false,
   },
 ] as const;
 

@@ -13,7 +13,7 @@ const repairSupported = process.platform === "win32" || process.platform === "li
 
 export function daemonBinaryPath(): string {
   const binaryName =
-    process.platform === "win32" ? "sing-box-daemon.exe" : "sing-box-daemon";
+    process.platform === "win32" ? "slate-daemon.exe" : "sing-box-daemon";
   if (app.isPackaged) {
     return join(process.resourcesPath, "daemon", binaryName);
   }

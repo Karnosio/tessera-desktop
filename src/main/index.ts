@@ -66,9 +66,9 @@ function fatalErrorMessage(error: unknown, capture: RuntimeCrashCaptureResult): 
   const errorObject = error instanceof Error ? error : new Error(String(error));
   const reason = `${errorObject.name}: ${errorObject.message}`;
   if (capture.reportPath !== null) {
-    return `sing-box stopped unexpectedly.\n\n${reason}\n\nCrash report:\n${capture.reportPath}`;
+    return `Slate stopped unexpectedly.\n\n${reason}\n\nCrash report:\n${capture.reportPath}`;
   }
-  return `sing-box stopped unexpectedly.\n\n${reason}\n\nThe crash report could not be saved:\n${capture.saveError ?? "unknown error"}`;
+  return `Slate stopped unexpectedly.\n\n${reason}\n\nThe crash report could not be saved:\n${capture.saveError ?? "unknown error"}`;
 }
 
 function handleFatal(kind: string, error: unknown): never {
@@ -79,7 +79,7 @@ function handleFatal(kind: string, error: unknown): never {
   const capture = captureRuntimeCrash(kind, error);
   const message = fatalErrorMessage(error, capture);
   try {
-    dialog.showErrorBox("sing-box", message);
+    dialog.showErrorBox("Slate", message);
   } catch (dialogError) {
     process.stderr.write(`${message}\n\nFailed to show the error dialog: ${String(dialogError)}\n`);
   }
@@ -426,7 +426,7 @@ if (!singleInstanceLock) {
 } else {
   app.setAsDefaultProtocolClient("sing-box");
   if (process.platform === "win32") {
-    app.setAppUserModelId("io.nekohasekai.sfw");
+    app.setAppUserModelId("com.tessera.slate");
   }
 
   app.on("second-instance", (_event, argv, workingDirectory) => {

@@ -1,17 +1,16 @@
 {
-  "name": "sing-box",
+  "name": "slate",
   "desktopName": "sing-box.desktop",
   "private": true,
-  "description": "Windows and Linux client for sing-box, the universal proxy platform.",
-  "homepage": "https://github.com/sagernet/sing-box-for-desktop",
+  "description": "Slate",
+  "homepage": "https://github.com/Karnosio/tessera-desktop",
   "license": "GPL-3.0-or-later",
   "author": {
-    "name": "SagerNet",
-    "email": "contact-sagernet@sekai.icu"
+    "name": "Tessera"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SagerNet/sing-box-for-desktop.git"
+    "url": "git+https://github.com/Karnosio/tessera-desktop.git"
   },
   "type": "module",
   "packageManager": "pnpm@11.13.0",

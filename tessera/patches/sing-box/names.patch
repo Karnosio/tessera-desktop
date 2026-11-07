@@ -1,0 +1,71 @@
+diff --git a/experimental/boxdd/cmd_service_windows.go b/experimental/boxdd/cmd_service_windows.go
+index a65b6160..56244cdf 100644
+--- a/experimental/boxdd/cmd_service_windows.go
++++ b/experimental/boxdd/cmd_service_windows.go
+@@ -18,9 +18,9 @@ import (
+ )
+ 
+ const (
+-	serviceDisplayName             = "sing-box Service"
+-	serviceDescriptionText         = "Privileged service for sing-box"
+-	defaultServiceWorkingDirectory = `C:\ProgramData\sing-box-daemon`
++	serviceDisplayName             = "Slate Service"
++	serviceDescriptionText         = "Privileged service for Slate"
++	defaultServiceWorkingDirectory = `C:\ProgramData\slate-daemon`
+ )
+ 
+ var commandServiceFlagAllowUnsafeInstallation bool
+diff --git a/experimental/boxdd/main.go b/experimental/boxdd/main.go
+index 40df83a0..9ef0c67a 100644
+--- a/experimental/boxdd/main.go
++++ b/experimental/boxdd/main.go
+@@ -14,7 +14,7 @@ import (
+ 	"github.com/spf13/cobra"
+ )
+ 
+-const serviceName = "sing-box-daemon"
++const serviceName = "slate-daemon"
+ 
+ var mainCommand = &cobra.Command{
+ 	Use:     serviceName,
+diff --git a/experimental/boxdd/peer_windows.go b/experimental/boxdd/peer_windows.go
+index 7ccaf167..a6110b5f 100644
+--- a/experimental/boxdd/peer_windows.go
++++ b/experimental/boxdd/peer_windows.go
+@@ -22,8 +22,8 @@ import (
+ )
+ 
+ const (
+-	daemonExecutableName      = "sing-box-daemon.exe"
+-	applicationExecutableName = "sing-box.exe"
++	daemonExecutableName      = "slate-daemon.exe"
++	applicationExecutableName = "Slate.exe"
+ 	workerPipePrefix          = `\\.\pipe\sing-box-worker.`
+ )
+ 
+diff --git a/experimental/boxdd/server_windows.go b/experimental/boxdd/server_windows.go
+index 0adfdca2..1e3da5dd 100644
+--- a/experimental/boxdd/server_windows.go
++++ b/experimental/boxdd/server_windows.go
+@@ -23,7 +23,7 @@ const pipeSecurityDescriptor = `D:P(A;;GA;;;SY)(A;;GA;;;BA)(A;;GRGW;;;AU)`
+ // pipe buffer.
+ const (
+ 	pipeBufferSize = 65536
+-	daemonPipePath = `\\.\pipe\ProtectedPrefix\Administrators\sing-box`
++	daemonPipePath = `\\.\pipe\ProtectedPrefix\Administrators\slate`
+ )
+ 
+ func listenEndpoint() (net.Listener, error) {
+diff --git a/experimental/boxdd/update_windows.go b/experimental/boxdd/update_windows.go
+index a9dbdba7..1aa76fc3 100644
+--- a/experimental/boxdd/update_windows.go
++++ b/experimental/boxdd/update_windows.go
+@@ -22,7 +22,7 @@ import (
+ 
+ const (
+ 	updateInstallerDesktop = `winsta0\default`
+-	updateProductName      = "sing-box"
++	updateProductName      = "Slate"
+ 	seTcbPrivilege         = "SeTcbPrivilege"
+ 	seAssignPrimaryToken   = "SeAssignPrimaryTokenPrivilege"
+ 	seIncreaseQuota        = "SeIncreaseQuotaPrivilege"
