@@ -1,0 +1,2 @@
+@powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0snapshot.ps1"
+@pause

@@ -1,0 +1,18 @@
+<Configuration>
+  <MemoryInMB>4096</MemoryInMB>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>@ROOT@\in</HostFolder>
+      <SandboxFolder>C:\in</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>@ROOT@\out</HostFolder>
+      <SandboxFolder>C:\out</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>explorer.exe C:\in</Command>
+  </LogonCommand>
+</Configuration>
