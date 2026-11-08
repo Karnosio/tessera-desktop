@@ -5,21 +5,17 @@ import { useStream } from "@dashboard/api/stream";
 import type { DaemonConnectionState, DesktopHost } from "@dashboard/app/desktop";
 import { ServiceStatus_Type } from "@dashboard/gen/daemon/started_service_pb";
 
-import type { ConnectionState, LatencyState } from "./ui/bundle.js";
+import type { ConnectionState } from "./ui/bundle.js";
 import { plural, t } from "./i18n";
-import { summarize } from "./methods";
+import { latencyLabels } from "./labels";
+import { useAuto } from "./auto";
+import { MethodsSheet, speedBadge } from "./MethodsSheet";
+import { useMethods } from "./useMethods";
+import type { MethodSummary } from "./useMethods";
 
 export function message(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
-
-export const latencyLabels = {
-  good: t("ts_latency_good"),
-  slow: t("ts_latency_slow"),
-  dead: t("ts_latency_dead"),
-  unknown: t("ts_latency_unknown"),
-  testing: t("ts_latency_testing"),
-};
 
 const powerLabels = {
   off: t("ts_power_title_off"),
@@ -72,19 +68,24 @@ function onFor(startedAt: number, now: number): string | undefined {
   );
 }
 
-function latencyState(delayMs: number): LatencyState {
-  if (delayMs <= 0) {
-    return "unknown";
+function methodText(summary: MethodSummary): string {
+  if (summary.fixed) {
+    return t("ts_method_fixed");
   }
-  return delayMs <= 250 ? "good" : "slow";
+  if (!summary.auto) {
+    return summary.name ?? t("ts_method_fixed");
+  }
+  return summary.name === null ? t("ts_method_auto") : t("ts_method_auto_with", summary.name);
 }
 
 interface MainScreenProps {
   host: DesktopHost;
   api: DaemonApi;
   connection: DaemonConnectionState;
+  profileId: string | null;
   profileName: string | null;
   onProfiles: () => void;
+  onSettings: () => void;
   onAdd: () => void;
 }
 
@@ -98,8 +99,8 @@ export function MainScreen(props: MainScreenProps) {
           size="icon"
           icon="settings"
           aria-label={t("ts_settings")}
-          title={t("tsd_advanced")}
-          onClick={() => void window.tessera.openAdvanced()}
+          title={t("ts_settings")}
+          onClick={props.onSettings}
         />
       }
     />
@@ -138,8 +139,11 @@ function Power(props: MainScreenProps & { profileName: string }) {
   const groups = useStream(api.groups);
   const [pending, setPending] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const status = serviceStatus.data.status?.status ?? ServiceStatus_Type.IDLE;
   const started = status === ServiceStatus_Type.STARTED;
+  const auto = useAuto();
+  const model = useMethods(api, groups.data, started, props.profileId, auto);
   const startedAt = useStartedAt(api, started);
   const now = useNow(30_000);
 
@@ -163,8 +167,7 @@ function Power(props: MainScreenProps & { profileName: string }) {
     state = "off";
   }
 
-  const toggle = () => {
-    const stop = state === "on" || state === "connecting";
+  const run = (stop: boolean) => {
     setPending(true);
     setFailure(null);
     (stop ? host.service.stop() : host.service.start())
@@ -174,17 +177,19 @@ function Power(props: MainScreenProps & { profileName: string }) {
         api.serviceStatus.reconnectNow();
       });
   };
+  const toggle = () => run(state === "on" || state === "connecting");
 
-  const method = started ? summarize(groups.data.groups) : null;
-  let methodText: string;
-  if (method === null) {
-    methodText = t("ts_method_auto");
-  } else if (!method.auto) {
-    methodText = method.name ?? t("ts_method_fixed");
-  } else {
-    methodText = method.name === null ? t("ts_method_auto") : t("ts_method_auto_with", method.name);
+  const openMethods = () => {
+    setSheetOpen(true);
+    model.pingOnOpen();
+  };
+  const { ping, speed } = model.summary;
+  let meta;
+  if (speed !== undefined) {
+    meta = <T.SpeedBadge {...speedBadge(speed, false)} />;
+  } else if (ping !== undefined) {
+    meta = <T.LatencyBadge {...ping} labels={latencyLabels} />;
   }
-  const delayMs = method?.delayMs ?? 0;
 
   return (
     <div className="slate-main">
@@ -206,13 +211,22 @@ function Power(props: MainScreenProps & { profileName: string }) {
           { label: t("ts_profile"), value: props.profileName, onClick: props.onProfiles },
           {
             label: t("ts_method"),
-            value: methodText,
-            meta: <T.LatencyBadge state={latencyState(delayMs)} ms={delayMs} labels={latencyLabels} />,
-            // Шторка способов — шаг 8 плана; до тех пор выбор способа — в панели upstream
-            onClick: () => void window.tessera.openAdvanced(),
+            value: methodText(model.summary),
+            meta,
+            onClick: openMethods,
           },
         ]}
       />
+      {sheetOpen && (
+        <MethodsSheet
+          model={model}
+          profileName={props.profileName}
+          started={started}
+          connecting={state === "connecting"}
+          onEnable={() => run(false)}
+          onClose={() => setSheetOpen(false)}
+        />
+      )}
     </div>
   );
 }

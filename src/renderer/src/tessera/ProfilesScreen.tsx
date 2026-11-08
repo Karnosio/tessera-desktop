@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
 import type { DesktopHost, DesktopProfile } from "@dashboard/app/desktop";
+import type { ConvertedProfiles } from "@shared/tessera";
 
-import type { ProfileAction } from "./ui/bundle.js";
+import type { ProfileAction, ProfileRowProps } from "./ui/bundle.js";
 import { ago, plural, t } from "./i18n";
 import { downloadFailed } from "./importProfile";
 import { message } from "./MainScreen";
@@ -53,7 +54,16 @@ export function ProfilesScreen(props: ProfilesScreenProps) {
   const { host, profiles } = props;
   const [menuId, setMenuId] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<DesktopProfile | null>(null);
+  const [converted, setConverted] = useState<ConvertedProfiles>({ ids: [], urls: [] });
   const now = Date.now();
+
+  // Обновление подписки может собрать её заново или прийти готовым JSON — отметки перечитываем при каждом изменении
+  useEffect(() => {
+    void window.tessera.convertedProfiles().then(setConverted);
+  }, [profiles]);
+
+  const isConverted = (profile: DesktopProfile) =>
+    converted.ids.includes(profile.id) || (profile.remoteUrl !== undefined && converted.urls.includes(profile.remoteUrl));
 
   useEffect(() => {
     if (menuId !== null && !profiles.some((profile) => profile.id === menuId)) {
@@ -127,12 +137,19 @@ export function ProfilesScreen(props: ProfilesScreenProps) {
       <div className="slate-stack" role="radiogroup" aria-label={t("ts_profile")}>
         {profiles.map((profile, index) => {
           const days = staleDays(profile, now);
+          const badges: NonNullable<ProfileRowProps["badges"]> = [];
+          if (isConverted(profile)) {
+            badges.push({ text: t("ts_converted_badge"), variant: "accent", icon: "link" });
+          }
+          if (days !== null) {
+            badges.push({ text: t("ts_profile_stale", plural("ts_days", days)), variant: "warning" });
+          }
           return (
             <T.ProfileRow
               key={profile.id}
               name={profile.name}
               meta={meta(profile, now)}
-              badges={days === null ? undefined : [{ text: t("ts_profile_stale", plural("ts_days", days)), variant: "warning" }]}
+              badges={badges.length === 0 ? undefined : badges}
               selected={profile.id === props.selectedId}
               actions={menuId === profile.id ? actions(profile, index) : undefined}
               menuLabel={t("ts_profile_actions", profile.name)}

@@ -1,29 +1,87 @@
 import { useEffect, useRef, useState } from "react";
 
 import type { DesktopHost, DesktopProfile } from "@dashboard/app/desktop";
+import type { Conversion, Skipped } from "@shared/tessera";
 
-import { t } from "./i18n";
+import { plural, t } from "./i18n";
 import { importFile, importText } from "./importProfile";
 import type { ImportError, ImportOutcome } from "./importProfile";
 import { Modal } from "./Modal";
 
 export type AddJob = () => Promise<ImportOutcome>;
 
-type Step = { kind: "choose" } | { kind: "link" } | { kind: "busy" } | { kind: "result"; outcome: ImportOutcome };
+type Step =
+  | { kind: "choose" }
+  | { kind: "link" }
+  | { kind: "busy" }
+  | { kind: "result"; outcome: ImportOutcome; running: boolean };
 
 const FAILURE: Record<ImportError, [string, string]> = {
   empty: ["ts_import_empty_title", "ts_import_empty_hint"],
-  unsupported: ["ts_import_unsupported_title", "tsd_unsupported_hint"],
-  links: ["tsd_links_later_title", "tsd_links_later_hint"],
+  unsupported: ["ts_import_unsupported_title", "ts_import_unsupported_hint"],
+  nothing: ["ts_import_nothing_title", "ts_import_nothing_hint"],
   download: ["ts_import_download_title", "ts_import_download_hint"],
   rejected: ["ts_import_rejected_title", "ts_import_rejected_hint"],
 };
+
+const MAX_SKIPPED_LINES = 5;
+
+function conversionText(conversion: Conversion): string {
+  let sent: string;
+  switch (conversion.format) {
+    case "links": {
+      const count = conversion.ways + conversion.skipped.length;
+      // Одна ссылка — одна фраза: «собрало из неё»
+      if (count === 1) {
+        return t("ts_converted_one_link");
+      }
+      sent = plural("ts_converted_links", count);
+      break;
+    }
+    case "clash":
+      sent = t("ts_converted_clash");
+      break;
+    case "wireguard":
+      sent = t("ts_converted_wireguard");
+      break;
+  }
+  return `${sent} ${t(conversion.ways > 1 ? "ts_converted_built_auto" : "ts_converted_built")}`;
+}
+
+const XRAY_ONLY = { xhttp: "XHTTP", mkcp: "mKCP", "vless-encryption": "VLESS Encryption" } as const;
+
+/** Каждый не вошедший способ — с причиной: молча терять способы нельзя (§3.1). Длинный список обрезаем. */
+function skippedLines(skipped: Skipped[]): string[] {
+  const lines = skipped.slice(0, MAX_SKIPPED_LINES).map((item) => {
+    switch (item.reason) {
+      case "unsupported":
+        return t("ts_skipped_unsupported", item.name, item.protocol ?? "");
+      case "broken":
+        return t("ts_skipped_broken", item.name);
+      default:
+        return t("ts_skipped_xray", item.name, XRAY_ONLY[item.reason]);
+    }
+  });
+  const more = skipped.length - lines.length;
+  return more > 0 ? [...lines, t("ts_skipped_more", more)] : lines;
+}
+
+function Lines(props: { lines: string[] }) {
+  return props.lines.map((line, index) => (
+    <span key={index} className="slate-line">
+      {line}
+    </span>
+  ));
+}
 
 interface AddProfileSheetProps {
   host: DesktopHost;
   profiles: DesktopProfile[];
   /** Импорт уже начат — ссылкой sing-box:// или файлом, открытым в Slate. */
   job?: AddJob;
+  /** Туннель включён: добавленный профиль сразу заменяет прежний, включать нечего. */
+  running: boolean;
+  onAdded: () => void;
   onClose: () => void;
   onEnable: () => void;
 }
@@ -36,9 +94,17 @@ export function AddProfileSheet(props: AddProfileSheetProps) {
   const profilesRef = useRef(props.profiles);
   profilesRef.current = props.profiles;
 
+  const runningRef = useRef(props.running);
+  runningRef.current = props.running;
   const run = (job: AddJob) => {
     setStep({ kind: "busy" });
-    void job().then((outcome) => setStep({ kind: "result", outcome }));
+    void job().then((outcome) => {
+      const running = runningRef.current;
+      if (outcome.kind === "added" && running) {
+        props.onAdded();
+      }
+      setStep({ kind: "result", outcome, running });
+    });
   };
 
   const initialJob = useRef(props.job);
@@ -136,20 +202,47 @@ export function AddProfileSheet(props: AddProfileSheetProps) {
     case "result": {
       const outcome = step.outcome;
       if (outcome.kind === "added") {
+        const conversion = outcome.conversion;
         sheet = (
           <T.Sheet
             id="result"
             title={t(outcome.existed ? "ts_updated_title" : "ts_added_title")}
-            description={outcome.name}
-            footer={[
-              <T.Button key="enable" size="lg" block icon="power" onClick={props.onEnable}>
-                {t("ts_enable")}
-              </T.Button>,
-              <T.Button key="later" size="lg" block variant="ghost" onClick={props.onClose}>
-                {t("ts_later")}
-              </T.Button>,
-            ]}
-          />
+            description={
+              conversion === undefined
+                ? outcome.name
+                : t("ts_name_with_ways", outcome.name, plural("ts_ways", conversion.ways))
+            }
+            footer={
+              step.running
+                ? [
+                    <T.Button key="done" size="lg" block onClick={props.onClose}>
+                      {t("ts_done")}
+                    </T.Button>,
+                  ]
+                : [
+                    <T.Button key="enable" size="lg" block icon="power" onClick={props.onEnable}>
+                      {t("ts_enable")}
+                    </T.Button>,
+                    <T.Button key="later" size="lg" block variant="ghost" onClick={props.onClose}>
+                      {t("ts_later")}
+                    </T.Button>,
+                  ]
+            }
+          >
+            {/* Сборка нарушает принцип №1, поэтому о ней говорим прямо (§3.1) */}
+            {conversion !== undefined && (
+              <div className="slate-stack">
+                <T.Callout tone="info" title={t("ts_converted_title")}>
+                  {conversionText(conversion)}
+                </T.Callout>
+                {conversion.skipped.length > 0 && (
+                  <T.Callout tone="warning" title={plural("ts_skipped_title", conversion.skipped.length)}>
+                    <Lines lines={skippedLines(conversion.skipped)} />
+                  </T.Callout>
+                )}
+              </div>
+            )}
+          </T.Sheet>
         );
       } else {
         const [title, hint] = FAILURE[outcome.error];
@@ -169,6 +262,11 @@ export function AddProfileSheet(props: AddProfileSheetProps) {
             <T.Callout tone="destructive" title={t(title)}>
               {t(hint)}
             </T.Callout>
+            {outcome.skipped !== undefined && outcome.skipped.length > 0 && (
+              <p className="slate-lines t-secondary">
+                <Lines lines={skippedLines(outcome.skipped)} />
+              </p>
+            )}
             {outcome.detail !== undefined && (
               <p className="slate-detail t-caption">{t("ts_import_detail", outcome.detail)}</p>
             )}

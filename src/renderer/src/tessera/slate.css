@@ -62,3 +62,45 @@ body,
   overflow-wrap: anywhere;
   color: var(--muted-foreground);
 }
+
+/* Как .pv-section в превью MethodPicker: подпись раздела способов */
+.slate-section {
+  margin: var(--space-3) 0 var(--space-1);
+  padding: 0 var(--space-4);
+}
+
+.slate-sheet-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64px;
+  color: var(--accent-foreground);
+}
+
+/* Как .pv-settings в превью SettingsScreen */
+.slate-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-2) 0 var(--space-6);
+}
+
+.slate-license {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-6);
+  color: var(--foreground);
+}
+
+.slate-line {
+  display: block;
+}
+
+.slate-lines {
+  color: var(--foreground);
+}
+
+.slate-license p {
+  margin: 0;
+}

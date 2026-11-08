@@ -1,0 +1,15 @@
+{
+  "log": { "level": "info" },
+  "inbounds": [
+    { "type": "mixed", "tag": "mixed-in", "listen": "127.0.0.1", "listen_port": 2081 },
+    { "type": "socks", "tag": "relay-in", "listen": "127.0.0.1", "listen_port": 2082 }
+  ],
+  "outbounds": [
+    { "type": "selector", "tag": "proxy", "outbounds": ["auto", "socks-a", "socks-b", "direct"], "default": "auto" },
+    { "type": "urltest", "tag": "auto", "outbounds": ["socks-a", "socks-b"] },
+    { "type": "socks", "tag": "socks-a", "server": "127.0.0.1", "server_port": 2082 },
+    { "type": "socks", "tag": "socks-b", "server": "127.0.0.1", "server_port": 2082 },
+    { "type": "direct", "tag": "direct" }
+  ],
+  "route": { "rules": [{ "inbound": ["relay-in"], "outbound": "direct" }], "final": "proxy" }
+}

@@ -19,6 +19,7 @@ import { desktopService } from "./daemon";
 import { Preference, settingsDatabase } from "./database";
 import { serviceStartOptions } from "./settings";
 import { userAgent } from "./userAgent";
+import { prepareSubscription } from "./tessera/subscription";
 import { applicationService } from "./worker";
 import { daemonState } from "./state";
 
@@ -233,7 +234,11 @@ async function fetchRemoteContent(remoteUrl: string): Promise<string> {
     }
     throw new Error(`HTTP ${status}: ${body}`);
   }
-  return await readLimitedResponse(response, MAXIMUM_REMOTE_PROFILE_BYTES);
+  return prepareSubscription(
+    remoteUrl,
+    response.headers,
+    await readLimitedResponse(response, MAXIMUM_REMOTE_PROFILE_BYTES),
+  );
 }
 
 async function insertProfile(

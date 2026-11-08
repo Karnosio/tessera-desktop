@@ -10,7 +10,6 @@ export const language: Language = navigator.languages.some((tag) => tag.toLowerC
 // Только на Windows: службы, починки и окна «Для опытных» на телефоне нет.
 const desktopStrings: Record<Language, Record<string, string>> = {
   ru: {
-    tsd_advanced: "Для опытных",
     tsd_service_connecting: "Связываемся со службой Slate…",
     tsd_service_not_installed: "Служба Slate не установлена",
     tsd_service_not_running: "Служба Slate не запущена",
@@ -21,13 +20,10 @@ const desktopStrings: Record<Language, Record<string, string>> = {
     tsd_service_other_user_description: "Если забрать себе, у него Slate выключится.",
     tsd_repair: "Починить",
     tsd_take_over: "Забрать себе",
-    tsd_links_later_title: "Такие ссылки пока не подходят",
-    tsd_links_later_hint:
-      "Slate для Windows пока не умеет ссылки вида vless:// и настройки Clash. Попросите у того, кто выдал доступ, ссылку на подписку для sing-box.",
-    tsd_unsupported_hint: "Подходят ссылка на подписку и файлы с настройками sing-box.",
+    tsd_open_at_login: "Открывать Slate при входе в Windows",
+    tsd_open_at_login_description: "Значком в трее, без окна. Включённое подключение после перезагрузки вернётся и так",
   },
   uk: {
-    tsd_advanced: "Для досвідчених",
     tsd_service_connecting: "Зв’язуємося зі службою Slate…",
     tsd_service_not_installed: "Службу Slate не встановлено",
     tsd_service_not_running: "Службу Slate не запущено",
@@ -38,10 +34,8 @@ const desktopStrings: Record<Language, Record<string, string>> = {
     tsd_service_other_user_description: "Якщо забрати собі, у нього Slate вимкнеться.",
     tsd_repair: "Полагодити",
     tsd_take_over: "Забрати собі",
-    tsd_links_later_title: "Такі посилання поки не підходять",
-    tsd_links_later_hint:
-      "Slate для Windows поки не вміє посилання виду vless:// і налаштування Clash. Попросіть у того, хто видав доступ, посилання на підписку для sing-box.",
-    tsd_unsupported_hint: "Підходять посилання на підписку і файли з налаштуваннями sing-box.",
+    tsd_open_at_login: "Відкривати Slate під час входу у Windows",
+    tsd_open_at_login_description: "Значком у треї, без вікна. Увімкнене підключення після перезавантаження повернеться і так",
   },
 };
 
